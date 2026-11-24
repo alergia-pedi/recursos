@@ -529,37 +529,24 @@ function renderCatalog() {
 }
 
 async function loadCatalog() {
+    try {
+        const response = await fetch('./recursos.json');
 
-  const container = document.getElementById('nursingTiles');
+        if (!response.ok) {
+            throw new Error('No se pudo cargar el catálogo');
+        }
 
-  try {
+        catalogData = await response.json();
 
-    const response = await fetch('./recursos.json');
+        renderCatalog();
 
-    if (!response.ok) {
-      throw new Error('No se pudo cargar el catálogo');
+    } catch (error) {
+        console.error('Error cargando recursos:', error);
     }
-
-    catalogData = await response.json();
-
-    renderCatalog();
-
-  } catch (error) {
-
-    console.error('Error cargando recursos:', error);
-
-    container.innerHTML = `
-      <div class="catalog-message">
-        Error al cargar los recursos.
-        Comprueba el archivo recursos.json.
-      </div>
-    `;
-
-  }
-
 }
 
 applyLanguage('es');
+loadCatalog();
 </script>
 </body>
 </html>
