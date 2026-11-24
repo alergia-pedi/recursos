@@ -54,6 +54,15 @@ input:focus,select:focus,textarea:focus{border-color:#4d8ca2;box-shadow:0 0 0 3p
 .footer-note{font-size:12px;color:var(--muted);margin-top:20px}
 @media(max-width:800px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.fields{grid-template-columns:1fr}}
 .tiles.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.catalog-message{
+grid-column:1/-1;
+padding:15px;
+background:white;
+border:1px solid var(--line);
+border-radius:12px;
+color:var(--muted);
+font-size:13px;
+}
 @media(max-width:480px){.tiles,.tiles.two{grid-template-columns:1fr}.toolbar{align-items:flex-start;flex-direction:column}.topbar{padding:17px 20px}}
 @media print{body{background:white}.topbar,.toolbar,.actions,.footer-note,.notice{display:none!important}.wrap{margin:0;padding:0}.page{display:none!important}#antecedentes.page.active{display:block!important}.panel{box-shadow:none;break-inside:avoid}.panel-body{display:block!important}.conditional{display:block!important}.summary{box-shadow:none}}
 </style>
@@ -76,10 +85,9 @@ input:focus,select:focus,textarea:focus{border-color:#4d8ca2;box-shadow:0 0 0 3p
     </div>
   </div>
   <h2 data-i18n="chooseResource">Selecciona el tipo de recurso</h2>
-  <div class="tiles two">
-    <button class="tile" id="goMedical" type="button"><span class="ico">🩺</span><strong data-i18n="medicalResources">Recursos médicos</strong><small data-i18n="medicalDescription">Asistentes y herramientas para la consulta médica</small></button>
-    <button class="tile" id="goNursing" type="button"><span class="ico">🩹</span><strong data-i18n="nursingResources">Recursos de enfermería</strong><small data-i18n="nursingDescription">Herramientas y recursos para la consulta de enfermería</small></button>
-  </div>
+<div class="tiles two" id="nursingTiles">
+<div class="catalog-message">Cargando recursos...</div>
+</div>
   <p class="footer-note" data-i18n="portalNote">El idioma seleccionado se aplicará a los recursos disponibles.</p>
 </section>
 
@@ -303,7 +311,9 @@ function translateSummaryCa(text){
  for(const [a,b] of pairs) text=text.split(a).join(b);
  return text.replace(/ \./g,'.').replace(/  +/g,' ');
 }
-function makeSummary(){
+function makeSummary()
+  renderCatalog();
+}
  updateConditional();
  const v=k=>valueOf(k), yes=k=>v(k)==='Sí', no=k=>v(k)==='No', known=k=>!!v(k)&&v(k)!=='No consta';
  const blocks=[];
@@ -411,6 +421,106 @@ document.getElementById('clearForm').addEventListener('click',()=>{
  document.querySelectorAll('.conditional').forEach(el=>el.classList.remove('show'));
  makeSummary();window.scrollTo(0,0);
 });
+
+let catalogData = null;
+
+function renderCatalog() {
+
+  if (!catalogData) return;
+
+  const container = document.getElementById('nursingTiles');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  const resources = catalogData.enfermeria || [];
+
+  resources.forEach(resource => {
+
+    const card = document.createElement('button');
+    card.className = 'tile';
+    card.type = 'button';
+
+    const icon = document.createElement('span');
+    icon.className = 'ico';
+    icon.textContent = resource.icono || '📋';
+
+    const title = document.createElement('strong');
+    title.textContent =
+      resource.nombre[currentLanguage] ||
+      resource.nombre.es;
+
+    const description = document.createElement('small');
+    description.textContent =
+      resource.descripcion[currentLanguage] ||
+      resource.descripcion.es;
+
+    card.appendChild(icon);
+    card.appendChild(title);
+    card.appendChild(description);
+
+    card.addEventListener('click', () => {
+      window.location.href = resource.url;
+    });
+
+    container.appendChild(card);
+
+  });
+
+  // Herramienta pendiente de incorporar
+  const asthma = document.createElement('button');
+  asthma.className = 'tile disabled';
+  asthma.type = 'button';
+
+  asthma.innerHTML = `
+    <span class="ico">🫁</span>
+    <strong>
+      ${currentLanguage === 'ca'
+        ? 'Consulta d’infermeria en asma'
+        : 'Consulta de enfermería en asma'}
+    </strong>
+    <small>
+      ${currentLanguage === 'ca'
+        ? 'Properament'
+        : 'Próximamente'}
+    </small>
+  `;
+
+  asthma.disabled = true;
+  container.appendChild(asthma);
+}
+
+async function loadCatalog() {
+
+  const container = document.getElementById('nursingTiles');
+
+  try {
+
+    const response = await fetch('./recursos.json');
+
+    if (!response.ok) {
+      throw new Error('No se pudo cargar el catálogo');
+    }
+
+    catalogData = await response.json();
+
+    renderCatalog();
+
+  } catch (error) {
+
+    console.error('Error cargando recursos:', error);
+
+    container.innerHTML = `
+      <div class="catalog-message">
+        Error al cargar los recursos.
+        Comprueba el archivo recursos.json.
+      </div>
+    `;
+
+  }
+
+}
+
 applyLanguage('es');
 </script>
 </body>
