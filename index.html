@@ -243,8 +243,29 @@ function renderCatalog() {
     const resources = catalogData.enfermeria || [];
 
     resources.forEach(function(resource) {
-        console.log(resource.nombre.es);
-    });
+        const card = document.createElement('button');
+card.className = 'tile';
+card.type = 'button';
+
+const icon = document.createElement('span');
+icon.className = 'ico';
+icon.textContent = resource.icono || '📋';
+
+const title = document.createElement('strong');
+title.textContent = resource.nombre[currentLanguage] || resource.nombre.es;
+
+const description = document.createElement('small');
+description.textContent = resource.descripcion[currentLanguage] || resource.descripcion.es;
+
+card.appendChild(icon);
+card.appendChild(title);
+card.appendChild(description);
+
+container.appendChild(card);
+      
+      card.addEventListener('click', function() {
+    window.location.href = resource.url;
+});
 }
   
 const yesNo=['Sí','No','No consta'];
