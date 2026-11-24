@@ -1,0 +1,19 @@
+
+{
+  "enfermeria": [
+    {
+      "id": "provocacion-oral",
+      "nombre": {
+        "es": "Prueba de provocación oral",
+        "ca": "Prova de provocació oral"
+      },
+      "descripcion": {
+        "es": "Cálculo de dosis para pruebas de exposición a alimentos",
+        "ca": "Càlcul de dosis per a proves de provocació amb aliments"
+      },
+      "icono": "💉",
+      "url": "enfermeria/provocacion-oral/"
+    }
+  ],
+  "medicos": []
+}
