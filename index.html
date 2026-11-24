@@ -234,7 +234,19 @@ function applyLanguage(lang) {
 
 function renderCatalog() {
     if (!catalogData) return;
+
+    const container = document.getElementById('nursingTiles');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    const resources = catalogData.enfermeria || [];
+
+    resources.forEach(function(resource) {
+        console.log(resource.nombre.es);
+    });
 }
+  
 const yesNo=['Sí','No','No consta'];
 function radioGroup(id,key,opts=yesNo){
   const root=document.getElementById(id);
