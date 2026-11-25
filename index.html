@@ -350,9 +350,7 @@ function translateSummaryCa(text){
  for(const [a,b] of pairs) text=text.split(a).join(b);
  return text.replace(/ \./g,'.').replace(/  +/g,' ');
 }
-function makeSummary()
-  renderCatalog();
-}
+function makeSummary() {
  updateConditional();
  const v=k=>valueOf(k), yes=k=>v(k)==='Sí', no=k=>v(k)==='No', known=k=>!!v(k)&&v(k)!=='No consta';
  const blocks=[];
